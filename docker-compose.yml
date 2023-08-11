@@ -1,0 +1,52 @@
+# Based on https://github.com/mempool/mempool/blob/master/docker/docker-compose.yml
+# Original documentation available at https://github.com/mempool/mempool/tree/master/docker
+
+version: "3.7"
+
+services:
+  web:
+    environment:
+      FRONTEND_HTTP_PORT: "8080"
+      BACKEND_MAINNET_HTTP_HOST: "api"
+    image: mempool/frontend:latest
+    user: "1000:1000"
+    restart: on-failure
+    stop_grace_period: 1m
+    command: "./wait-for db:3306 --timeout=720 -- nginx -g 'daemon off;'"
+    ports:
+      - 80:8080
+  api:
+    environment:
+      MEMPOOL_BACKEND: "none"
+      DATABASE_ENABLED: "true"
+      DATABASE_HOST: "db"
+      DATABASE_DATABASE: "mempool"
+      DATABASE_USERNAME: "mempool"
+      DATABASE_PASSWORD: "mempool"
+      STATISTICS_ENABLED: "true"
+    env_file:
+      - .api.env
+    image: mempool/backend:latest
+    user: "1000:1000"
+    restart: on-failure
+    stop_grace_period: 1m
+    command: "./wait-for-it.sh db:3306 --timeout=720 --strict -- ./start.sh"
+    volumes:
+      - ./data:/backend/cache
+  db:
+    environment:
+      MYSQL_DATABASE: "mempool"
+      MYSQL_USER: "mempool"
+      MYSQL_PASSWORD: "mempool"
+      MYSQL_ROOT_PASSWORD: "admin"
+    image: mariadb:latest
+    # user: "1000:1000" # This line had to be commented out for the container to work
+    restart: on-failure
+    stop_grace_period: 1m
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+
+networks:
+  default:
+    name: bitcoin-nw
+    external: true
