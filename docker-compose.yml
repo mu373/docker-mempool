@@ -17,13 +17,12 @@ services:
       - 8181:8080
   api:
     environment:
-      MEMPOOL_BACKEND: "none"
       DATABASE_ENABLED: "true"
       DATABASE_HOST: "db"
       DATABASE_DATABASE: "mempool"
       DATABASE_USERNAME: "mempool"
       DATABASE_PASSWORD: "mempool"
-      STATISTICS_ENABLED: "true"
+      STATISTICS_ENABLED: "false"
     env_file:
       - .api.env
     image: mempool/backend:latest
