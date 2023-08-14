@@ -19,4 +19,4 @@ Start the container
 # Make sure to start bitcoind container *before* starting this mempool container
 docker compose up -d
 ```
-Your Mempool instance should be running at [http://localhost](http://localhost).
+Your Mempool instance should be running at [http://localhost:8181](http://localhost:8181).
